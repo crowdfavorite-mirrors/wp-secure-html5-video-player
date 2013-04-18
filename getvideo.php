@@ -5,7 +5,7 @@ function secure_html5_video_player_parent_path_with_file($filepath, $needle, $li
 	$curr_path = dirname($filepath);
 	for ($i = 0; $i < $limit; $i++) {
 		$ls = scandir($curr_path);
-		if (in_array($needle, $ls)) return $curr_path;
+		if (isset($ls) && is_array($ls) && in_array($needle, $ls)) return $curr_path;
 		$curr_path = dirname($curr_path);
 	}
 	return NULL;
@@ -112,13 +112,13 @@ else {
 }
 
 
+$file_buffer_size = 1024;
+$video_serve_timeout_s = 3600; //1 hr 
 
-$chars_sent = 0;
+set_time_limit($video_serve_timeout_s); 
 while (!feof($fp)) {
-	set_time_limit(0);
-	$content = fread($fp, 1024);
+	$content = fread($fp, $file_buffer_size);
 	echo $content;
-	$chars_sent += strlen($content);
 	if (connection_aborted()) {
 		break;
 	}
@@ -126,6 +126,5 @@ while (!feof($fp)) {
 	ob_flush();
 }
 fclose($fp);
-
 
 ?>
